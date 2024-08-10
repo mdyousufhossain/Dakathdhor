@@ -5,11 +5,19 @@
  */
 
 
-const express =  require('express')
+import express from 'express';
 const app  =  express()
-const PORT =  9000;
+
+const PORT = 9000
+
+/**
+ * this is the watcher , well not that good but at least somet'n 
+ */
 
 
+
+
+// just for the starter delete this not required ! 
 app.get('/',(req,res) => {
     res.send('Hello Dakath!')   
 })
@@ -22,9 +30,9 @@ const startServer =  async () => {
         // database calling maybe 
         app.listen(PORT,
             () => {
+                // maybe remove when on live ? 
                 console.log(`Server started at : http://localhost:${PORT}`)
-            }
-        )
+            })
     } catch (error) {
        console.error(error) 
     }

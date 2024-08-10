@@ -1,0 +1,45 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+
+    /*
+        well, this is pain in ass but minor but this will save you from more pain 
+    */
+    "rules": {
+      // TypeScript-specific rules
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "@typescript-eslint/explicit-function-return-type": "off", 
+      "@typescript-eslint/explicit-module-boundary-types": "off", 
+      "@typescript-eslint/no-explicit-any": "warn", // Discourage the use of `any` type
+      "@typescript-eslint/consistent-type-definitions": ["error", "interface"], // Prefer interfaces over type aliases for object types
+      "@typescript-eslint/no-inferrable-types": "error", // Disallow explicit types on variables that can be inferred
+  
+      // JavaScript/ESLint core rules
+      "no-console": "warn", 
+      "no-var": "error", // Disallow var, prefer const or let
+      "prefer-const": "error", // Prefer const over let where possible
+      "eqeqeq": ["error", "smart"], // Require === and !==, except when comparing to null
+  
+      // Code style rules
+      "indent": ["error", 2, { "SwitchCase": 1 }],
+      "quotes": ["error", "single", { "avoidEscape": true }], 
+      "semi": ["error", "always"],       
+      "comma-dangle": ["error", "always-multiline"], 
+      "object-curly-spacing": ["error", "always"], 
+      "arrow-spacing": ["error", { "before": true, "after": true }], 
+  
+      // Best practices
+      "no-shadow": "off", // Turn off core rule to use TypeScript's version
+      "@typescript-eslint/no-shadow": ["error"], // Disallow variable declarations from shadowing variables declared in the outer scope
+      "no-use-before-define": "off", // Turn off core rule to use TypeScript's version
+      "@typescript-eslint/no-use-before-define": ["error"], // Disallow the use of variables before they are defined
+      "prefer-template": "error", // Prefer template literals over string concatenation
+      "no-multi-spaces": "error", // Disallow multiple spaces
+      "no-multiple-empty-lines": ["error", { "max": 1 }], // Limit the number of consecutive empty lines
+      "spaced-comment": ["error", "always", { "exceptions": ["-", "+"] }] // Enforce consistent spacing after comments
+    }
+  }
+  
