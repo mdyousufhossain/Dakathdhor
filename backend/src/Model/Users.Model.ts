@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose'
+import { Schema, model, Document, Types } from 'mongoose'
 
 interface IUser extends Document {
   username: string
@@ -9,6 +9,8 @@ interface IUser extends Document {
     coordinates: [number, number]
   }
   isOnline: boolean
+  refreshToken?:string
+  _id: Types.ObjectId;
 }
 
 const userSchema = new Schema<IUser>({
@@ -41,6 +43,9 @@ const userSchema = new Schema<IUser>({
     type: Boolean,
     default: false, // it will depend if open by dafualt , user can turn off ..
   },
+  refreshToken : {
+    type : String
+  }
 })
 
 // Add a 2dsphere index to the location field for geospatial queries. is this alien languages
