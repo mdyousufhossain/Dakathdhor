@@ -16,32 +16,30 @@ import User from '../Model/Users.Model';
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // i will add later 
 
 // Register a new user
-export const HandleregisterUser = async (req: Request, res: Response): Promise<void> => {
+export const HandleRegisterUser = async (req: Request, res: Response): Promise<void> => {
     try {
         // 
         const { username, password, latitude, longitude } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({ username });
+
         if (existingUser) {
             res.status(400).json({ error: 'Username already exists' });
             return;
         }
+        const hasedPW = await bcrypt.hash(password, 10); // this can be better , for now its faaaine 
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create new user
         const newUser = new User({
             username,
-            password: hashedPassword,
+            password: hasedPW,
             location: {
                 type: 'Point',
-                coordinates: [longitude, latitude],
+                coordinates: [longitude, latitude],// these are coordination of maps both togethar we will locate the people
             },
             isOnline: true,
         });
-
+ 
         await newUser.save();
 
         // Generate JWT token
