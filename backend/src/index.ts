@@ -14,9 +14,6 @@ const PORT = 9000
  * this is the watcher , well not that good but at least somet'n 
  */
 
-
-
-
 // just for the starter delete this not required ! 
 app.get('/',(req,res) => {
     res.send('Hello Dakath!')   
