@@ -1,15 +1,15 @@
-import { Schema, model, Document, Types } from 'mongoose'
+import { Document, model, Schema, Types } from 'mongoose';
 
 interface IUser extends Document {
-  username: string
-  password: string
-  message: string
-  location: {
-    type: string
-    coordinates: [number, number]
-  }
-  isOnline: boolean
-  refreshToken?:string
+  username: string;
+  password: string;
+  message?: string; // This field should be optional if it's not always required
+  location?: {      // Make location optional as well
+    type: 'Point';  // Since you are using a 2dsphere index, 'Point' is the only allowed value
+    coordinates: [number, number]; // Coordinates are an array of two numbers [longitude, latitude]
+  };
+  isOnline: boolean;
+  refreshToken?: string; // Optional, since not all users may have a refresh token
   _id: Types.ObjectId;
 }
 
@@ -31,27 +31,23 @@ const userSchema = new Schema<IUser>({
     type: {
       type: String,
       enum: ['Point'], // 'location.type' must be 'Point'
-      required: true,
-      default: 'Point',
     },
     coordinates: {
-      type: [Number], // user must have location on
-      required: true,
+      type: [Number], // coordinates must be an array of numbers
     },
   },
   isOnline: {
     type: Boolean,
-    default: false, // it will depend if open by dafualt , user can turn off ..
+    default: false,
   },
-  refreshToken : {
-    type : String
-  }
-})
+  refreshToken: {
+    type: String,
+  },
+});
 
-// Add a 2dsphere index to the location field for geospatial queries. is this alien languages
-userSchema.index({ location: '2dsphere' })
+// Add a 2dsphere index to the location field for geospatial queries
+userSchema.index({ location: '2dsphere' });
 
-// Create a model.
 const User = model<IUser>('User', userSchema)
 
 export default User

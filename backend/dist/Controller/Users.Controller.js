@@ -28,8 +28,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // i will add la
 // Register a new user
 const HandleRegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //
-        const { username, password, latitude, longitude } = req.body;
+        const { username, password, longitude, latitude } = req.body;
         // Check if user already exists
         const existingUser = yield Users_Model_1.default.findOne({ username });
         if (existingUser) {
@@ -38,17 +37,22 @@ const HandleRegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, funct
         }
         if (!username || !password) {
             res.status(400).json({ error: 'Please fill all the required fields' });
+            return;
         }
-        const hasedPW = yield bcryptjs_1.default.hash(password, 10); // this can be better , for now its faaaine
+        const hashedPW = yield bcryptjs_1.default.hash(password, 10);
+        // Create the new user object
         const newUser = new Users_Model_1.default({
             username,
-            password: hasedPW,
-            // location: {
-            //     type: 'Point',
-            //     coordinates: [longitude, latitude],// these are coordination of maps both togethar we will locate the people
-            // },
+            password: hashedPW,
             isOnline: true,
         });
+        // Add location only if both longitude and latitude are provided
+        if (longitude !== undefined && latitude !== undefined) {
+            newUser.location = {
+                type: 'Point',
+                coordinates: [longitude, latitude],
+            };
+        }
         yield newUser.save();
         // Generate JWT token
         const token = jsonwebtoken_1.default.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
@@ -57,6 +61,7 @@ const HandleRegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, funct
             .json({ token, user: { id: newUser._id, username: newUser.username } });
     }
     catch (error) {
+        console.error('Error in HandleRegisterUser:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });

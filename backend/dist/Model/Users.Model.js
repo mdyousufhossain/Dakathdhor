@@ -19,24 +19,20 @@ const userSchema = new mongoose_1.Schema({
         type: {
             type: String,
             enum: ['Point'], // 'location.type' must be 'Point'
-            required: true,
-            default: 'Point',
         },
         coordinates: {
-            type: [Number], // user must have location on
-            required: true,
+            type: [Number], // coordinates must be an array of numbers
         },
     },
     isOnline: {
         type: Boolean,
-        default: false, // it will depend if open by dafualt , user can turn off ..
+        default: false,
     },
     refreshToken: {
-        type: String
-    }
+        type: String,
+    },
 });
-// Add a 2dsphere index to the location field for geospatial queries. is this alien languages
+// Add a 2dsphere index to the location field for geospatial queries
 userSchema.index({ location: '2dsphere' });
-// Create a model.
 const User = (0, mongoose_1.model)('User', userSchema);
 exports.default = User;
