@@ -21,6 +21,7 @@ const Users_Model_1 = __importDefault(require("../Model/Users.Model"));
  * but for sake of progress i guess i will use this easy method
  * lots of things will change
  * @todo adding a deleteing method
+ * @todo there many error in the login and logout method i will try to solve isssue it iwll take times , this more than nagging nibbi girlfriend than i expected
  *
  * well deleting is account will be more peramoy than creating one yeah for sake of progress i will that later aswell ,
  */
@@ -28,40 +29,37 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // i will add la
 // Register a new user
 const HandleRegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, password, longitude, latitude } = req.body;
-        // Check if user already exists
+        const { username, password } = req.body;
         const existingUser = yield Users_Model_1.default.findOne({ username });
         if (existingUser) {
-            res.status(409).json({ error: 'Username already exists' });
+            res.status(409).json({ error: 'This username is already in use' });
             return;
         }
         if (!username || !password) {
             res.status(400).json({ error: 'Please fill all the required fields' });
             return;
         }
-        const hashedPW = yield bcryptjs_1.default.hash(password, 10);
-        // Create the new user object
-        const newUser = new Users_Model_1.default({
+        const hashed = yield bcryptjs_1.default.hash(password, 10);
+        const newUser = yield Users_Model_1.default.create({
             username,
-            password: hashedPW,
-            isOnline: true,
+            password: hashed,
         });
-        // Add location only if both longitude and latitude are provided
-        if (longitude !== undefined && latitude !== undefined) {
-            newUser.location = {
-                type: 'Point',
-                coordinates: [longitude, latitude],
-            };
-        }
+        const accessToken = jsonwebtoken_1.default.sign({ userid: newUser._id, username: newUser.username }, process.env.ACCESS_TOKEN_SECRET_1, { expiresIn: '15m' });
+        const refreshToken = jsonwebtoken_1.default.sign({ userid: newUser._id, username: newUser.username }, process.env.REFRESH_TOKEN_SECRET_2, { expiresIn: '1d' });
+        newUser.refreshToken = refreshToken;
         yield newUser.save();
-        // Generate JWT token
-        const token = jsonwebtoken_1.default.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
-        res
-            .status(201)
-            .json({ token, user: { id: newUser._id, username: newUser.username } });
+        res.cookie('jwt', refreshToken, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+        res.status(201).json({
+            username,
+            accessToken,
+            success: `New user ${username} created!`,
+        });
     }
     catch (error) {
-        console.error('Error in HandleRegisterUser:', error);
+        console.error('Error in handleRegister:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
@@ -69,33 +67,56 @@ exports.HandleRegisterUser = HandleRegisterUser;
 // Login user
 const HandleloginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, password, latitude, longitude } = req.body;
-        // Find user by username
+        const { username, password } = req.body;
+        if (!username || !password) {
+            res.status(400).json({ message: 'Please add username or password' });
+            return;
+        }
         const user = yield Users_Model_1.default.findOne({ username });
         if (!user) {
-            res.status(401).json({ error: 'Invalid credentials' });
+            res.status(401).json({ message: 'No registered account. Please create an account.' });
             return;
         }
-        // Check password
+        if (user.accountLockedUntil && user.accountLockedUntil > new Date()) {
+            res.status(401).json({
+                message: 'Account locked. Too many failed login attempts. Try again later.',
+            });
+            return;
+        }
         const isMatch = yield bcryptjs_1.default.compare(password, user.password);
-        if (!isMatch) {
-            res.status(401).json({ error: 'Invalid credentials' });
-            return;
+        if (isMatch) {
+            user.loginAttempts = 0;
+            user.accountLockedUntil = null; // we will work on this later 
+            const accessToken = jsonwebtoken_1.default.sign({ userid: user._id, username: user.username }, process.env.ACCESS_TOKEN_SECRET_1, { expiresIn: '15m' });
+            const refreshToken = jsonwebtoken_1.default.sign({ userid: user._id, username: user.username }, process.env.REFRESH_TOKEN_SECRET_2, { expiresIn: '1d' });
+            user.refreshToken = refreshToken;
+            yield user.save();
+            res.cookie('jwt', refreshToken, {
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000,
+            });
+            res.json({
+                username,
+                accessToken,
+                success: `User logged in: ${username}`,
+            });
         }
-        // Update user location and set as online
-        user.isOnline = true;
-        user.location = {
-            type: 'Point',
-            coordinates: [longitude, latitude],
-        };
-        yield user.save();
-        // Generate JWT token
-        const token = jsonwebtoken_1.default.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
-        res
-            .status(200)
-            .json({ token, user: { id: user._id, username: user.username } });
+        else {
+            user.loginAttempts++;
+            yield user.save();
+            if (user.loginAttempts >= 5) {
+                user.accountLockedUntil = new Date(Date.now() + 15 * 60 * 1000);
+                yield user.save();
+                res.status(401).json({
+                    message: 'Account locked. Too many failed login attempts. Try again later.',
+                });
+                return;
+            }
+            res.status(401).json({ message: 'Invalid credentials' });
+        }
     }
     catch (error) {
+        console.error('Error in loginHandler:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
@@ -103,19 +124,25 @@ exports.HandleloginUser = HandleloginUser;
 // Logout user
 const HandlelogoutUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //
-        const { username } = req.body;
-        // Find user by ID and set as offline
-        const user = yield Users_Model_1.default.findById(username);
-        if (!user) {
-            res.status(404).json({ error: 'User not found' });
+        const cookies = req.cookies;
+        if (!(cookies === null || cookies === void 0 ? void 0 : cookies.jwt)) {
+            res.sendStatus(204); // No content
             return;
         }
-        user.isOnline = false;
+        const refreshToken = cookies.jwt;
+        const user = yield Users_Model_1.default.findOne({ refreshToken });
+        if (!user) {
+            res.clearCookie('jwt', { httpOnly: true });
+            res.sendStatus(204); // No content
+            return;
+        }
+        user.refreshToken = '';
         yield user.save();
-        res.status(200).json({ message: 'User logged out successfully' });
+        res.clearCookie('jwt', { httpOnly: true });
+        res.sendStatus(204); // No content
     }
     catch (error) {
+        console.error('Error in handleLogout:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });

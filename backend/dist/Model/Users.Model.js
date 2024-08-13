@@ -8,12 +8,31 @@ const userSchema = new mongoose_1.Schema({
         unique: true,
         trim: true,
     },
-    message: {
+    batman: {
+        type: Boolean,
+        required: true
+    },
+    mobile: {
+        type: String
+    },
+    email: {
+        type: String
+    },
+    role: {
+        type: [Number]
+    },
+    // taskgiven?:Schema.Types.ObjectId[],
+    // taskCompleted?:Schema.Types.ObjectId[],
+    // message?: Schema.Types.ObjectId[],
+    bio: {
         type: String,
     },
     password: {
         type: String,
         required: true,
+    },
+    avatar: {
+        type: String
     },
     location: {
         type: {
@@ -30,6 +49,21 @@ const userSchema = new mongoose_1.Schema({
     },
     refreshToken: {
         type: String,
+    },
+    // Add loginAttempts field to track failed login attempts
+    loginAttempts: {
+        type: Number,
+        default: 0,
+    },
+    // Add accountLockedUntil field to track lockout expiration time
+    accountLockedUntil: {
+        type: Date,
+        default: null, // Indicates that the account is not locked
+    },
+    createdAt: {
+        type: Date,
+        required: true,
+        default: Date.now,
     },
 });
 // Add a 2dsphere index to the location field for geospatial queries

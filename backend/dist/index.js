@@ -45,7 +45,7 @@ const credential_1 = __importStar(require("./Middleware/credential"));
 const express_1 = __importDefault(require("express"));
 const logger_1 = require("./Middleware/logger");
 const app = (0, express_1.default)();
-const userRegisterCreate_1 = __importDefault(require("./Route/userRegisterCreate"));
+const userRoute_1 = __importDefault(require("./Route/userRoute"));
 const moongoose_1 = require("./Config/moongoose");
 const PORT = 9000;
 /**
@@ -57,7 +57,7 @@ app.use((0, cors_1.default)(credential_1.corsOptions));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 // just for the starter delete this not required !
-app.use('/api/v1', userRegisterCreate_1.default);
+app.use('/api/v1', userRoute_1.default);
 // app.use('/', (req, res) => {
 //   res.send('Hello Dakath!')
 // })

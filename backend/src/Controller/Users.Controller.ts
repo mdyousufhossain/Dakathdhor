@@ -8,6 +8,7 @@ import User from '../Model/Users.Model'
  * but for sake of progress i guess i will use this easy method
  * lots of things will change
  * @todo adding a deleteing method
+ * @todo there many error in the login and logout method i will try to solve isssue it iwll take times , this more than nagging nibbi girlfriend than i expected 
  *
  * well deleting is account will be more peramoy than creating one yeah for sake of progress i will that later aswell ,
  */
@@ -15,18 +16,13 @@ import User from '../Model/Users.Model'
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret' // i will add later
 
 // Register a new user
-export const HandleRegisterUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const HandleRegisterUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, password, longitude, latitude } = req.body;
+    const { username, password } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ username });
-
     if (existingUser) {
-      res.status(409).json({ error: 'Username already exists' });
+      res.status(409).json({ error: 'This username is already in use' });
       return;
     }
 
@@ -35,33 +31,41 @@ export const HandleRegisterUser = async (
       return;
     }
 
-    const hashedPW = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 10);
 
-    // Create the new user object
-    const newUser = new User({
+    const newUser = await User.create({
       username,
-      password: hashedPW,
-      isOnline: true,
+      password: hashed,
     });
 
-    // Add location only if both longitude and latitude are provided
-    if (longitude !== undefined && latitude !== undefined) {
-      newUser.location = {
-        type: 'Point',
-        coordinates: [longitude, latitude],
-      };
-    }
+    const accessToken = jwt.sign(
+      { userid: newUser._id, username: newUser.username },
+      process.env.ACCESS_TOKEN_SECRET_1 as string,
+      { expiresIn: '15m' }
+    );
 
+    const refreshToken = jwt.sign(
+      { userid: newUser._id, username: newUser.username },
+      process.env.REFRESH_TOKEN_SECRET_2 as string,
+      { expiresIn: '1d' }
+    );
+
+    newUser.refreshToken = refreshToken;
     await newUser.save();
 
-    // Generate JWT token
-    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
+    res.cookie('jwt', refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
 
-    res
-      .status(201)
-      .json({ token, user: { id: newUser._id, username: newUser.username } });
+    res.status(201).json({
+      username,
+      accessToken,
+      success: `New user ${username} created!`,
+    });
+
   } catch (error) {
-    console.error('Error in HandleRegisterUser:', error);
+    console.error('Error in handleRegister:', error);
     res.status(500).json({ error: 'Server error' });
   }
 };
@@ -71,68 +75,111 @@ export const HandleRegisterUser = async (
 
 
 
+
 // Login user
-export const HandleloginUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const HandleloginUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, password, latitude, longitude } = req.body
+    const { username, password } = req.body;
 
-    // Find user by username
-    const user = await User.findOne({ username })
+    if (!username || !password) {
+      res.status(400).json({ message: 'Please add username or password' });
+      return;
+    }
+
+    const user = await User.findOne({ username });
+
     if (!user) {
-      res.status(401).json({ error: 'Invalid credentials' })
-      return
+      res.status(401).json({ message: 'No registered account. Please create an account.' });
+      return;
     }
 
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) {
-      res.status(401).json({ error: 'Invalid credentials' })
-      return
+    if (user.accountLockedUntil && user.accountLockedUntil > new Date()) {
+      res.status(401).json({
+        message: 'Account locked. Too many failed login attempts. Try again later.',
+      });
+      return;
     }
 
-    // Update user location and set as online
-    user.isOnline = true
-    user.location = {
-      type: 'Point',
-      coordinates: [longitude, latitude],
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (isMatch) {
+      user.loginAttempts = 0;
+     user.accountLockedUntil = null; // we will work on this later 
+
+      const accessToken = jwt.sign(
+        { userid: user._id, username: user.username },
+        process.env.ACCESS_TOKEN_SECRET_1 as string,
+        { expiresIn: '15m' }
+      );
+
+      const refreshToken = jwt.sign(
+        { userid: user._id, username: user.username },
+        process.env.REFRESH_TOKEN_SECRET_2 as string,
+        { expiresIn: '1d' }
+      );
+
+      user.refreshToken = refreshToken;
+      await user.save();
+
+      res.cookie('jwt', refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+      res.json({
+        username,
+        accessToken,
+        success: `User logged in: ${username}`,
+      });
+
+    } else {
+      user.loginAttempts++;
+      await user.save();
+
+      if (user.loginAttempts >= 5) {
+        user.accountLockedUntil = new Date(Date.now() + 15 * 60 * 1000);
+        await user.save();
+
+        res.status(401).json({
+          message: 'Account locked. Too many failed login attempts. Try again later.',
+        });
+        return;
+      }
+
+      res.status(401).json({ message: 'Invalid credentials' });
     }
-
-    await user.save()
-
-    // Generate JWT token
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' })
-
-    res
-      .status(200)
-      .json({ token, user: { id: user._id, username: user.username } })
   } catch (error) {
-    res.status(500).json({ error: 'Server error' })
+    console.error('Error in loginHandler:', error);
+    res.status(500).json({ error: 'Server error' });
   }
-}
+};
+
 
 // Logout user
-export const HandlelogoutUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const HandlelogoutUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    //
-    const { username } = req.body
-    // Find user by ID and set as offline
-    const user = await User.findById(username)
-    if (!user) {
-      res.status(404).json({ error: 'User not found' })
-      return
+    const cookies = req.cookies;
+    if (!cookies?.jwt) {
+      res.sendStatus(204); // No content
+      return;
     }
 
-    user.isOnline = false
-    await user.save()
+    const refreshToken = cookies.jwt;
+    const user = await User.findOne({ refreshToken });
 
-    res.status(200).json({ message: 'User logged out successfully' })
+    if (!user) {
+      res.clearCookie('jwt', { httpOnly: true });
+      res.sendStatus(204); // No content
+      return;
+    }
+
+    user.refreshToken = '';
+    await user.save();
+
+    res.clearCookie('jwt', { httpOnly: true });
+    res.sendStatus(204); // No content
   } catch (error) {
-    res.status(500).json({ error: 'Server error' })
+    console.error('Error in handleLogout:', error);
+    res.status(500).json({ error: 'Server error' });
   }
-}
+};

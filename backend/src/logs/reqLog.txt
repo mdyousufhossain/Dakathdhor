@@ -8,3 +8,6 @@
 20240812	22:06:04	POST	undefined	/api/v1/user/register
 20240812	22:11:15	POST	undefined	/api/v1/user/register
 20240812	22:12:44	POST	undefined	/api/v1/user/register
+20240813	22:29:09	POST	undefined	/api/v1/user/login
+20240813	22:29:49	POST	undefined	/api/v1/user/login?username%20=balamar1&password=balamar1234
+20240813	22:30:25	POST	undefined	/api/v1/user/login

@@ -1,16 +1,49 @@
-import { Document, model, Schema, Types } from 'mongoose';
+import { Document, model, Schema, Types } from 'mongoose'
+
+/**
+ * This is a attentive task .. 
+ * 
+ * task .. task will have identification who given the emergency  task  
+ * a message  , probably contact information ? 
+ * of course dispatch location coordination  that will give the google map ?
+ * and hidden from user  ? if the task is compelted only can moved by the user and if all participent vote then task is completed then it will remove and count as completed d
+ * 
+ * id ,  message , user_who_posted , coordination , contact information ? optional or crucial .. in future we will add video , photo , audio , all the media item in post 
+ * 
+ * message will have separted  scheme , id , user , text , and post or personal link ? 
+ * maybe we will separted location shema who knows 
+ */
+
 
 interface IUser extends Document {
-  username: string;
-  password: string;
-  message?: string; // This field should be optional if it's not always required
-  location?: {      // Make location optional as well
-    type: 'Point';  // Since you are using a 2dsphere index, 'Point' is the only allowed value
-    coordinates: [number, number]; // Coordinates are an array of two numbers [longitude, latitude]
+  username: string
+  password: string
+  mobile?:string
+  email?:string
+  batman?:string
+  taskgiven?:Schema.Types.ObjectId[]
+  taskCompleted?:Schema.Types.ObjectId[]
+  message?: Schema.Types.ObjectId[] // This field should be optional if it's not always required
+  location?: {
+    // Make location optional as well
+    // blud i hardly any idea with the location coordniate i usually ddint work this is will change in test mode 
+    type: 'Point' // Since we are using a 2dsphere index, 'Point' is the only allowed value /**maybe someday we will use relational database then we can use more accuarte google api or somethi'n 
+    coordinates: [number, number] // Coordinates are an array of two numbers [longitude, latitude] aah boring
   };
-  isOnline: boolean;
-  refreshToken?: string; // Optional, since not all users may have a refresh token
-  _id: Types.ObjectId;
+  avatar?:string; // in future update 
+  bio?:string;
+  isOnline: boolean
+  /**
+   * these are sect concern i think we need more attention here but my tiny head cannot think otherwise 
+   * but i dont like the idea between every request endup coming to the database its kinda costly we will do something on this .. maybe on user cache if tha limit is cross that we will reach database tell them hey lock this bas* he tryna hax 
+   * and that basta will wait until the cool down ? like in front end , so their nonsene garbage will not interfare the database 
+   */
+  loginAttempts: number 
+  accountLockedUntil?: Date | null // only date i have in my life
+  createdAt: Date
+  refreshToken?: string // Optional, since not all users may have a refresh token
+  _id: Types.ObjectId
+  role?:[number]
 }
 
 const userSchema = new Schema<IUser>({
@@ -20,12 +53,31 @@ const userSchema = new Schema<IUser>({
     unique: true,
     trim: true,
   },
-  message: {
+  batman: {
+    type:Boolean,
+    required:true
+  },
+  mobile: {
+    type:String
+  },
+  email: {
+    type:String
+  },
+  role: {
+    type:[Number]
+  },
+  // taskgiven?:Schema.Types.ObjectId[],
+  // taskCompleted?:Schema.Types.ObjectId[],
+  // message?: Schema.Types.ObjectId[],
+  bio: {
     type: String,
   },
   password: {
     type: String,
     required: true,
+  },
+  avatar:{
+    type:String
   },
   location: {
     type: {
@@ -43,10 +95,27 @@ const userSchema = new Schema<IUser>({
   refreshToken: {
     type: String,
   },
-});
+  // Add loginAttempts field to track failed login attempts
+  loginAttempts: {
+    type: Number,
+    default: 0,
+  },
+
+  // Add accountLockedUntil field to track lockout expiration time
+  accountLockedUntil: {
+    type: Date,
+    default: null, // Indicates that the account is not locked
+  },
+
+  createdAt: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
+})
 
 // Add a 2dsphere index to the location field for geospatial queries
-userSchema.index({ location: '2dsphere' });
+userSchema.index({ location: '2dsphere' })
 
 const User = model<IUser>('User', userSchema)
 

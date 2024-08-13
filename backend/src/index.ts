@@ -9,7 +9,8 @@ import express from 'express'
 import { logger } from './Middleware/logger'
 const app = express()
 
-import userRouter from './Route/userRegisterCreate';
+import userRoute from './Route/userRoute'
+
 import { connectionToDatabase } from './Config/moongoose'
 
 const PORT = 9000
@@ -26,7 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 
 
 
-app.use('/api/v1', userRouter);
+app.use('/api/v1', userRoute);
 
 // app.use('/', (req, res) => {
 //   res.send('Hello Dakath!')
