@@ -6,10 +6,14 @@
 import  cors  from 'cors'
 import credentials, { corsOptions } from './Middleware/credential'
 import express from 'express'
+// middlewhware
 import { logger } from './Middleware/logger'
+import verifyJWT from './Middleware/verifyJWT'
 const app = express()
 
+// router
 import userRoute from './Route/userRoute'
+import taskRoute from './Route/taskRoute'
 
 import { connectionToDatabase } from './Config/moongoose'
 
@@ -29,6 +33,8 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/v1', userRoute);
 
+app.use(verifyJWT)
+app.use('api/v1', taskRoute )
 // app.use('/', (req, res) => {
 //   res.send('Hello Dakath!')
 // })

@@ -18,13 +18,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret' // i will add lat
 // Register a new user
 export const HandleRegisterUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, password } = req.body;
+    const { username, password,email } = req.body;
 
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      res.status(409).json({ error: 'This username is already in use' });
-      return;
-    }
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
+
+  if (userExists) {
+    res.status(400).json({
+      message: userExists.username === username 
+        ? "Username is already taken"
+        : "Email is already in use"
+    });
+  }
 
     if (!username || !password) {
       res.status(400).json({ error: 'Please fill all the required fields' });

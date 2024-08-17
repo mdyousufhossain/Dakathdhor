@@ -20,11 +20,16 @@ interface IUser extends Document {
   password: string
   mobile?:string
   email?:string
-  batman?:string
-  taskgiven?:Schema.Types.ObjectId[]
-  taskCompleted?:Schema.Types.ObjectId[]
-  message?: Schema.Types.ObjectId[] // This field should be optional if it's not always required
-  location?: {
+  batman?:string // people who will voulenteer themselve to help the people , 
+  taskgiven?:Schema.Types.ObjectId[] // we will separted schema to create task or emergency help it will be create new dimention to helps people like what typpe of help they need ... like freeing the seven sister perhaps ? ;> lord babar will be happy 
+  taskCompleted?:Schema.Types.ObjectId[] /// task complete is bit complex bcz in order to make this func happy we need actually complete the task which our gen is most feard of, boy why dont you complete the assignment i rather oppose the dickraider hasina regim and free my country ...let's talk about work now when task giver assure their helped is fullfilled they can press compelted button otherwise , participant can vote which will be tricky to make but hey i love pain ... if most of the particiment vote this task is compete then task will be completed 
+  /**
+   * @requires task creator authorizes
+   * or
+   * @requires  most participant vote
+   */ 
+  messages?: Schema.Types.ObjectId[] // This field should be optional if it's not always required
+  location?: { // maybe next update we have use separted schema since location will be a big deal :> 
     // Make location optional as well
     // blud i hardly any idea with the location coordniate i usually ddint work this is will change in test mode 
     type: 'Point' // Since we are using a 2dsphere index, 'Point' is the only allowed value /**maybe someday we will use relational database then we can use more accuarte google api or somethi'n 
@@ -55,7 +60,7 @@ const userSchema = new Schema<IUser>({
   },
   batman: {
     type:Boolean,
-    required:true
+    default:false
   },
   mobile: {
     type:String
@@ -66,9 +71,9 @@ const userSchema = new Schema<IUser>({
   role: {
     type:[Number]
   },
-  // taskgiven?:Schema.Types.ObjectId[],
-  // taskCompleted?:Schema.Types.ObjectId[],
-  // message?: Schema.Types.ObjectId[],
+   taskgiven:[{ type: Schema.Types.ObjectId, ref: 'Task', required: true }],
+   taskCompleted:[{ type: Schema.Types.ObjectId, ref: 'Task', required: true }],
+   messages: [{ type: Schema.Types.ObjectId, ref: 'Message', required: true }],
   bio: {
     type: String,
   },
@@ -115,6 +120,9 @@ const userSchema = new Schema<IUser>({
 })
 
 // Add a 2dsphere index to the location field for geospatial queries
+/**
+ * i dont belive i will use this cheap method  , i will improvee this im promise but let's just say my eyes is closed now  
+ */
 userSchema.index({ location: '2dsphere' })
 
 const User = model<IUser>('User', userSchema)
