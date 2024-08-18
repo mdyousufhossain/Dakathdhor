@@ -1,7 +1,10 @@
 // lib/api.ts
 
+
+const URL = process.env.LOCALURL || 'http://localhost:9000/api/v1'
+
 export async function apiRequest(endpoint: string, method: string, data?: any) {
-    const url = `http://localhost:9000/api/v1${endpoint}`;
+    const url = `${URL}${endpoint}`;
     
     const options: RequestInit = {
       method,
@@ -22,3 +25,22 @@ export async function apiRequest(endpoint: string, method: string, data?: any) {
     return response.json();
   }
   
+
+  export const checkAvailability = async (type: 'username' | 'email', value: string) => {
+
+    const response = await fetch(`${URL}/user/${type}?${type}=${value}`,{
+      credentials: 'include', // Include credentials such as cookies
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 401) {
+      console.error(response);
+      return false;
+    }
+
+    const data = await response.json();
+    console.log(data)
+    return data.available;
+  };
