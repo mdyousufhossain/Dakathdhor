@@ -94,3 +94,17 @@
 20240818	16:53:37	OPTIONS	http://localhost:3000	/api/v1/user/username?username=b
 20240818	16:53:37	GET	http://localhost:3000	/api/v1/user/email?email=yousufofficial7@gmail.com
 20240818	16:53:37	GET	http://localhost:3000	/api/v1/user/username?username=b
+20240818	20:09:11	OPTIONS	http://localhost:3000	/api/v1/user/username?username=Badboy77
+20240818	20:09:11	GET	http://localhost:3000	/api/v1/user/username?username=Badboy77
+20240818	20:09:17	OPTIONS	http://localhost:3000	/api/v1/user/username?username=Badboy7
+20240818	20:09:17	GET	http://localhost:3000	/api/v1/user/username?username=Badboy7
+20240818	20:09:40	OPTIONS	http://localhost:3000	/api/v1/user/email?email=yousuf_56@live.com
+20240818	20:09:40	GET	http://localhost:3000	/api/v1/user/email?email=yousuf_56@live.com
+20240818	20:09:57	OPTIONS	http://localhost:3000	/api/v1/user/register
+20240818	20:09:57	POST	http://localhost:3000	/api/v1/user/register
+20240818	20:28:06	OPTIONS	http://localhost:3000	/api/v1/user/login
+20240818	20:28:06	POST	http://localhost:3000	/api/v1/user/login
+20240818	22:30:25	OPTIONS	http://localhost:3000	/api/v1/user/login
+20240818	22:30:25	POST	http://localhost:3000	/api/v1/user/login
+20240818	23:43:33	OPTIONS	http://localhost:3000	/api/v1/user/login
+20240818	23:43:33	POST	http://localhost:3000	/api/v1/user/login

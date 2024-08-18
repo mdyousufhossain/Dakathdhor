@@ -3,7 +3,7 @@ import RegistrationForm from "@/components/forms/Registration"
 
 const Page = () => {
   return (
-    <div>
+    <div className="py-8">
         <RegistrationForm />
     </div>
   )

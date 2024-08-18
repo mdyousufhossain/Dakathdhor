@@ -24,11 +24,10 @@ import { debounce } from '@/lib/utils'
 
 function RegistrationForm() {
   const [isLoading, setIsLoading] = useState(false)
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
-    null
-  )
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
   const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null)
   const router = useRouter()
+
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -68,12 +67,8 @@ function RegistrationForm() {
     try {
       const response = await apiRequest('/user/register', 'POST', values)
       console.log('Registration successful:', response)
-      // redirecting , i will improve it lated
       router.push('/')
     } catch (error) {
-      /**
-       * im gonna make an error handler oneday :}
-       */
       console.error('Registration failed:', error)
     } finally {
       setIsLoading(false)
@@ -81,17 +76,17 @@ function RegistrationForm() {
   }
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-gray-100'>
-      <div className='w-full max-w-lg p-6 bg-white rounded-lg shadow-md'>
-        <h1 className='text-2xl font-semibold text-center mb-6'>Register</h1>
+    <div className='flex items-center justify-center min-h-screen bg-gray-50'>
+      <div className='w-full max-w-md p-8 bg-white rounded-lg shadow-lg'>
+        <h1 className='text-xl font-bold text-center mb-4'>Create Account</h1>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
             <FormField
               control={form.control}
               name='username'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel className="text-sm">Username</FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Your username'
@@ -101,11 +96,12 @@ function RegistrationForm() {
                         field.onChange(e)
                         debouncedHandleUsernameChange(e.target.value)
                       }}
+                      className="text-sm"
                     />
                   </FormControl>
                   {usernameAvailable !== null && (
                     <p
-                      className={`text-sm ${
+                      className={`text-xs mt-1 ${
                         usernameAvailable ? 'text-green-500' : 'text-red-500'
                       }`}
                     >
@@ -123,13 +119,14 @@ function RegistrationForm() {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-sm">Password</FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Make it strong'
                       type='password'
                       {...field}
                       disabled={isLoading}
+                      className="text-sm"
                     />
                   </FormControl>
                   <FormMessage />
@@ -141,7 +138,7 @@ function RegistrationForm() {
               name='email'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-sm">Email</FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Your email address'
@@ -152,11 +149,12 @@ function RegistrationForm() {
                         field.onChange(e)
                         debouncedHandleEmailChange(e.target.value)
                       }}
+                      className="text-sm"
                     />
                   </FormControl>
                   {emailAvailable !== null && (
                     <p
-                      className={`text-sm ${
+                      className={`text-xs mt-1 ${
                         emailAvailable ? 'text-green-500' : 'text-red-500'
                       }`}
                     >
@@ -173,7 +171,7 @@ function RegistrationForm() {
               control={form.control}
               name='batman'
               render={({ field }) => (
-                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                <FormItem className='flex items-start space-x-3 p-4 border rounded-md'>
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -181,13 +179,12 @@ function RegistrationForm() {
                       disabled={isLoading}
                     />
                   </FormControl>
-                  <div className='space-y-1 leading-none'>
-                    <FormLabel className='text-gray-700'>
-                      Are you sure you want to be Batman?
+                  <div className='leading-tight'>
+                    <FormLabel className='text-sm text-gray-700'>
+                      Become Batman
                     </FormLabel>
-                    <FormDescription className='text-sm text-gray-500'>
-                      You will receive notifications from victims, and
-                      involvement may be risky.
+                    <FormDescription className='text-xs text-gray-500'>
+                      You'll receive notifications from those in need. Be ready.
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -198,13 +195,14 @@ function RegistrationForm() {
               name='mobile'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contact Number</FormLabel>
+                  <FormLabel className="text-sm">Mobile Number</FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Your mobile number'
                       type='text'
                       {...field}
                       disabled={isLoading}
+                      className="text-sm"
                     />
                   </FormControl>
                   <FormMessage />
@@ -216,16 +214,17 @@ function RegistrationForm() {
               name='location'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location</FormLabel>
+                  <FormLabel className="text-sm">Location</FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Your location'
                       {...field}
                       disabled={isLoading}
+                      className="text-sm"
                     />
                   </FormControl>
-                  <FormDescription>
-                    Location will be sent when you request emergency help.
+                  <FormDescription className='text-xs'>
+                    Location will be used for emergency services.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -236,23 +235,24 @@ function RegistrationForm() {
               name='bio'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Bio</FormLabel>
+                  <FormLabel className="text-sm">Bio</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='Tell us something about yourself'
+                      placeholder='A bit about yourself...'
                       {...field}
                       disabled={isLoading}
+                      className="text-sm"
                     />
                   </FormControl>
-                  <FormDescription>
-                    E.g., &quotA fan of Jalal Uddin Rumi&quot
+                  <FormDescription className='text-xs'>
+                    E.g., "A fan of Jalal Uddin Rumi"
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <Button type='submit' className='w-full' disabled={isLoading}>
-              {isLoading ? <Loader /> : 'Submit'}
+              {isLoading ? <Loader /> : 'Create Account'}
             </Button>
           </form>
         </Form>

@@ -12,7 +12,7 @@ export async function apiRequest(endpoint: string, method: string, data?: any) {
         'Content-Type': 'application/json',
       },
       body: data ? JSON.stringify(data) : undefined,
-      credentials: 'include', // to include cookies
+      credentials: 'include', // include cookies
     };
   
     const response = await fetch(url, options);
@@ -29,7 +29,7 @@ export async function apiRequest(endpoint: string, method: string, data?: any) {
   export const checkAvailability = async (type: 'username' | 'email', value: string) => {
 
     const response = await fetch(`${URL}/user/${type}?${type}=${value}`,{
-      credentials: 'include', // Include credentials such as cookies
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
