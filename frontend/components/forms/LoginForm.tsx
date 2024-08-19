@@ -16,16 +16,18 @@ import {
 import Loader from '../cards/loader'
 import { apiRequest } from '@/app/api/registration/api'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/auth/AuthContext'
 
 const LoginSchema = z.object({
-  username: z.string().min(4,'Username is too short'),
-  password: z.string().min(6,'Password is required'),
+  username: z.string().min(4, 'Username is too short'),
+  password: z.string().min(6, 'Password is required'),
 })
 
 function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
   const router = useRouter()
+  const { setUser } = useAuth()
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -41,7 +43,9 @@ function LoginForm() {
 
     try {
       const response = await apiRequest('/user/login', 'POST', values)
-      console.log('Login successful:', response)
+      console.log('Login successful: from next js', response)
+
+       setUser({ username: response.user.username })
       router.push('/') // Redirect to the homepage or dashboard after successful login
     } catch (error: any) {
       console.error('Login failed:', error)
@@ -65,13 +69,13 @@ function LoginForm() {
               name='username'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm">Username</FormLabel>
+                  <FormLabel className='text-sm'>Username</FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Your username'
                       {...field}
                       disabled={isLoading}
-                      className="text-sm"
+                      className='text-sm'
                     />
                   </FormControl>
                   <FormMessage />
@@ -83,14 +87,14 @@ function LoginForm() {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm">Password</FormLabel>
+                  <FormLabel className='text-sm'>Password</FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Your password'
                       type='password'
                       {...field}
                       disabled={isLoading}
-                      className="text-sm"
+                      className='text-sm'
                     />
                   </FormControl>
                   <FormMessage />

@@ -75,8 +75,14 @@ export const HandleRegisterUser = async (
 
     res.status(201).json({
       username,
+      email,
+      batman,
+      avatar,
+      mobile,
+      location,
+      bio,
       accessToken,
-      success: `New user ${username} created!`,
+      success: `New user ${newUser} created!`,
     })
   } catch (error) {
     console.error('Error in handleRegister:', error)
@@ -141,9 +147,8 @@ export const HandleloginUser = async (
       })
 
       res.json({
-        username,
         accessToken,
-        success: `User logged in: ${username}`,
+        user,
       })
     } else {
       user.loginAttempts++
@@ -205,30 +210,45 @@ export const handleCheckAvailityUsername = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { username } = req.query;
+    const { username } = req.query
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username })
 
-    res.status(200).json({ available: !user }); // If user is null, it's available
+    res.status(200).json({ available: !user }) // If user is null, it's available
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ available: false, error: 'Server error' });
+    console.log(error)
+    res.status(500).json({ available: false, error: 'Server error' })
   }
-};
+}
 
 export const handleCheckAvailityEmail = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { email } = req.query;
+    const { email } = req.query
 
-    const isEmail = await User.findOne({ email });
+    const isEmail = await User.findOne({ email })
 
-    res.status(200).json({ available: !isEmail }); // If isEmail is null, it's available
+    res.status(200).json({ available: !isEmail }) // If isEmail is null, it's available
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ available: false, error: 'Server error' });
+    console.log(error)
+    res.status(500).json({ available: false, error: 'Server error' })
   }
-};
+}
 
+export const handleGetUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { username } = req.query
+
+    const user = await User.findOne({ username })
+
+    res.status(200).json({ user })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ available: false, error: 'Server error' })
+  }
+}

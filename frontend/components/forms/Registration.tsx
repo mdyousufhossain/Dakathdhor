@@ -184,7 +184,7 @@ function RegistrationForm() {
                       Become Batman
                     </FormLabel>
                     <FormDescription className='text-xs text-gray-500'>
-                      You'll receive notifications from those in need. Be ready.
+                      Youll receive notifications from those in need. Be ready.
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -245,7 +245,7 @@ function RegistrationForm() {
                     />
                   </FormControl>
                   <FormDescription className='text-xs'>
-                    E.g., "A fan of Jalal Uddin Rumi"
+                    E.g., A fan of Jalal Uddin Rumi
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

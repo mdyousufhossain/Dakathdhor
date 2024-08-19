@@ -5,11 +5,13 @@ import {
   HandleloginUser,
   handleCheckAvailityUsername,
   handleCheckAvailityEmail,
+  handleGetUser,
 } from '../Controller/Users.Controller'
 
 const router: Router = express.Router()
 
 // Member register handler
+
 router.get('/user/username', handleCheckAvailityUsername)
 router.get('/user/email', handleCheckAvailityEmail)
 

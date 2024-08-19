@@ -13,8 +13,9 @@ const app = express()
 
 // router
 import userRoute from './Route/userRoute'
+// protected routes
 import taskRoute from './Route/taskRoute'
-
+import userInfo  from './Route/userInfoRoute'
 import { connectionToDatabase } from './Config/moongoose'
 
 const PORT = 9000
@@ -35,6 +36,7 @@ app.use('/api/v1', userRoute);
 
 app.use(verifyJWT)
 app.use('api/v1', taskRoute )
+app.use('api/v1', userInfo )
 // app.use('/', (req, res) => {
 //   res.send('Hello Dakath!')
 // })
