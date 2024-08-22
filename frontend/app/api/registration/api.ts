@@ -46,7 +46,7 @@ export const checkAvailability = async (
 }
 
 export const getUserInfo = async (id: 'username' | 'email', value: string) => {
-  const response = await fetch(`${URL}/user/${id}?${id}=${value}`, {
+  const response = await fetch(`${URL}/user/getuser/${id}?${id}=${value}`, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
@@ -59,6 +59,6 @@ export const getUserInfo = async (id: 'username' | 'email', value: string) => {
   }
 
   const data = await response.json()
-  // console.log(data)
-  return { data }
+  console.log(data)
+  return data 
 }

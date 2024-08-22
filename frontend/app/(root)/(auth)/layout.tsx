@@ -1,3 +1,4 @@
+import Header from "@/components/shared/Header";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
   }>) {
     return (
       <html lang="en">
+        <Header />
         <body>{children}</body>
       </html>
     );

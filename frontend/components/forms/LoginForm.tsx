@@ -45,7 +45,7 @@ function LoginForm() {
       const response = await apiRequest('/user/login', 'POST', values)
       console.log('Login successful: from next js', response)
 
-       setUser({ username: response.user.username })
+       setUser(response.user)
       router.push('/') // Redirect to the homepage or dashboard after successful login
     } catch (error: any) {
       console.error('Login failed:', error)

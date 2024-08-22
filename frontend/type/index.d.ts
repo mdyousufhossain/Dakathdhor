@@ -13,7 +13,8 @@ export interface User  {
     createdAt: Date
     _id: Types.ObjectId
   }
-  setUser: (user: {
+  
+  setUser:{ (user: {
     username: string
     mobile?: string
     email?: string

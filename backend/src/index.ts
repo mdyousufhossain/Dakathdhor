@@ -5,6 +5,7 @@
  */
 import  cors  from 'cors'
 import credentials, { corsOptions } from './Middleware/credential'
+import cookieParser from 'cookie-parser'
 import express from 'express'
 // middlewhware
 import { logger } from './Middleware/logger'
@@ -25,6 +26,7 @@ const PORT = 9000
  */
 app.use(logger)
 app.use(credentials)
+app.use(cookieParser());
 app.use(cors(corsOptions))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -34,7 +36,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/v1', userRoute);
 
-app.use(verifyJWT)
+//app.use(verifyJWT)
 app.use('api/v1', taskRoute )
 app.use('api/v1', userInfo )
 // app.use('/', (req, res) => {
