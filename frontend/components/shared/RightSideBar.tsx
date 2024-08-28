@@ -53,7 +53,7 @@ const RightSidebar: React.FC<SidebarProps> = ({ items }) => {
 
       {/* Footer (optional) */}
       <div className='text-center text-xs text-gray-400'>
-        © 2024 Your Company
+        © 2024 Dakath Dhor App 
       </div>
     </aside>
   );

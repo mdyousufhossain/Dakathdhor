@@ -16,7 +16,7 @@ const Header = () => {
         <div className="flex items-center space-x-2">
           <div className="h-8 w-8 bg-gray-300" /> {/* Logo Placeholder */}
           <div>
-            <h1 className="font-bold text-lg capitalize">Help lagbe</h1>
+            <h1 className="font-bold text-lg capitalize">DakathDhor </h1>
             <p className="text-sm text-gray-500">emergency help</p>
           </div>
         </div>

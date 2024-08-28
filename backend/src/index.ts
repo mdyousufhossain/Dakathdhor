@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/v1', userRoute);
 
-//app.use(verifyJWT)
+app.use(verifyJWT)
 app.use('api/v1', taskRoute )
 app.use('api/v1', userInfo )
 // app.use('/', (req, res) => {

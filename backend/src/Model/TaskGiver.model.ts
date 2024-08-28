@@ -8,16 +8,18 @@ interface ITask extends Document {
     location: string
     isSolved: boolean // it depend taskGiver they can tab and completed or partiicant can vote 
     batmans : Schema.Types.ObjectId[]
+    comments?: Schema.Types.ObjectId[]
 }
 
 const TaskSchema = new Schema<ITask>({
     taskGiver: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],
     type: [{ type: String, required: true }],
-    message: { type: String, required: true },
+    message: { type: String, required: true, minlength: 10 , maxlength: 255 },
     media: [{ type: String }], // Defaulting to an array to allow for future extensions 
     location: [{type:String , required:true}],
     isSolved: { type: Boolean, default: false },
-    batmans: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+    batmans: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    comments:[{type:Schema.Types.ObjectId , ref: 'Comment'}]
 });
 
 // Create a model

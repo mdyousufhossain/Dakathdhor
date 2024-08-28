@@ -1,6 +1,10 @@
+import LocationTestButton from "@/components/shared/GetLocation"
+
 const page = () => {
   return (
-    <div>home</div>
+    <div>
+      <LocationTestButton />
+    </div>
   )
 }
 export default page

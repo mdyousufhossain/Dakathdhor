@@ -1,6 +1,9 @@
 import { CorsOptions } from 'cors';
 import { Request, Response, NextFunction } from 'express';
- const allowedOrigins = [
+ 
+
+// this is will be added into admin section 
+const allowedOrigins = [
     'https://www.yoursite.com',
     'http://localhost:5173',
     'http://localhost:3000',

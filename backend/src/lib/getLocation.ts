@@ -1,3 +1,9 @@
+
+/**
+ * 
+ * problem is typical navigator have no manner they just provide wrong location we need exac location 
+ */
+
 async function getUserLocation(): Promise<{ latitude: number; longitude: number }> {
     return await new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
