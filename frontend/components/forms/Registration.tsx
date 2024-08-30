@@ -67,6 +67,7 @@ function RegistrationForm() {
     try {
       const response = await apiRequest('/user/register', 'POST', values)
       console.log('Registration successful:', response)
+      localStorage.setItem('accessToken', JSON.stringify(response.accessToken))
       router.push('/')
     } catch (error) {
       console.error('Registration failed:', error)

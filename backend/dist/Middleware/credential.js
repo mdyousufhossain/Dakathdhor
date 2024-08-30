@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.corsOptions = void 0;
+// this is will be added into admin section 
 const allowedOrigins = [
     'https://www.yoursite.com',
-    'http://127.0.0.1:5050',
-    'http://localhost:5050',
+    'http://localhost:5173',
+    'http://localhost:3000',
     'http://localhost:9000'
 ];
 const credentials = (req, res, next) => {

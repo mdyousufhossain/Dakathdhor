@@ -30,3 +30,14 @@ export interface User  {
     _id: Types.ObjectId
   }) => void
 }
+
+
+export interface createTask {
+  author: string;
+  type: string;
+  message: string;
+  media?: string[];
+  location: string;
+  isSolved?: boolean;
+  batmans?: string[];
+}

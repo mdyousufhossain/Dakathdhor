@@ -13,31 +13,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const Users_Model_1 = __importDefault(require("../Model/Users.Model"));
+/**
+ * This will be the main middleware; the upper one is just for testing.
+ */
 const verifyJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.headers.authorization || req.headers.Authorization;
+    console.log('Authorization Header:', token);
+    // @ts-ignore
+    if (!token || !token.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized - no valid token' });
+    }
     try {
-        const refreshToken = req.cookies.jwt;
-        const { username } = req.body;
-        if (!refreshToken || !username) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-        const decoded = jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET_2);
-        const user = yield Users_Model_1.default.findOne({ username });
-        if (!user) {
-            return res.status(401).json({ message: "User not found" });
-        }
-        if (user._id.toString() !== decoded.userid) {
-            return res.status(401).json({ message: "Invalid user" });
-        }
-        if (user.refreshToken !== refreshToken) {
-            return res.status(401).json({ message: "Invalid refresh token" });
-        }
-        req.username = user.username;
-        req.userid = user._id.toString();
+        const decoded = jsonwebtoken_1.default.verify(
+        // @ts-ignore
+        token.split(' ')[1], process.env.ACCESS_TOKEN_SECRET_1);
+        console.log('Decoded JWT:', decoded); // just for the debug
+        req.username = decoded.username;
+        req.userid = decoded.userid;
         next();
     }
     catch (error) {
-        return res.status(401).json({ message: "Unauthorized" });
+        // @ts-ignore
+        console.error('Error verifying token:', error.message);
+        return res.status(403).json({ error: 'Invalid token' });
     }
 });
 exports.default = verifyJWT;

@@ -16,8 +16,8 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Users_Model_1 = __importDefault(require("../Model/Users.Model"));
 /**
  *
- * @param req
- * @param res
+ * @param req user token from the datase
+ * @param res response new access token
  * @returns
  * refresh token will refresh the login times its basically the tokenizer
  */

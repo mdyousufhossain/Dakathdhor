@@ -10,7 +10,7 @@ const userSchema = new mongoose_1.Schema({
     },
     batman: {
         type: Boolean,
-        required: true
+        default: false
     },
     mobile: {
         type: String
@@ -21,9 +21,9 @@ const userSchema = new mongoose_1.Schema({
     role: {
         type: [Number]
     },
-    // taskgiven?:Schema.Types.ObjectId[],
-    // taskCompleted?:Schema.Types.ObjectId[],
-    // message?: Schema.Types.ObjectId[],
+    taskgiven: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Task', required: true }],
+    taskCompleted: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Task', required: true }],
+    messages: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Message', required: true }],
     bio: {
         type: String,
     },
@@ -67,6 +67,9 @@ const userSchema = new mongoose_1.Schema({
     },
 });
 // Add a 2dsphere index to the location field for geospatial queries
+/**
+ * i dont belive i will use this cheap method  , i will improvee this im promise but let's just say my eyes is closed now
+ */
 userSchema.index({ location: '2dsphere' });
 const User = (0, mongoose_1.model)('User', userSchema);
 exports.default = User;

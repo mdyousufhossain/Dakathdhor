@@ -1,5 +1,13 @@
 import Header from "@/components/shared/Header";
 import { Metadata } from "next";
+import RightSidebar from "@/components/shared/RightSideBar"
+import { Home, Settings, LogOut } from 'lucide-react';
+
+const items = [
+  { label: 'Home', icon: <Home className='h-5 w-5' /> },
+  { label: 'Settings', icon: <Settings className='h-5 w-5' /> },
+  { label: 'Logout', icon: <LogOut className='h-5 w-5' />  },
+];
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -13,8 +21,10 @@ export const metadata: Metadata = {
   }>) {
     return (
       <html lang="en">
+        <body>
         <Header />
-        <body>{children}</body>
+          <RightSidebar items={items} />
+          {children}</body>
       </html>
     );
   }

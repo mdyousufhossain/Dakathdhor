@@ -10,12 +10,12 @@ import { useAuth } from '@/auth/AuthContext'
 const Header = () => {
     const { user } = useAuth()
   return (
-    <header className="flex items-center justify-between p-4 bg-white shadow-md z-50">
+    <section className="flex w-full p-4 justify-between bg-white ">
       {/* Left Section - Logo, Motto, and Search Bar */}
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">
           <div className="h-8 w-8 bg-gray-300" /> {/* Logo Placeholder */}
-          <div>
+          <div className='flex flex-col items-center'>
             <h1 className="font-bold text-lg capitalize">DakathDhor </h1>
             <p className="text-sm text-gray-500">emergency help</p>
           </div>
@@ -50,7 +50,7 @@ const Header = () => {
           <span className="font-medium text-sm">{user?.username}</span>
         </div>
       </div>
-    </header>
+    </section>
   )
 }
 

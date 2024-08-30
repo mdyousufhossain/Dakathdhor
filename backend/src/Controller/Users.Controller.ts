@@ -13,8 +13,6 @@ import User from '../Model/Users.Model'
  * well deleting is account will be more peramoy than creating one yeah for sake of progress i will that later aswell ,
  */
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret' // i will add later
-
 // Register a new user
 export const HandleRegisterUser = async (
   req: Request,
@@ -56,13 +54,13 @@ export const HandleRegisterUser = async (
     const accessToken = jwt.sign(
       { userid: newUser._id, username: newUser.username },
       process.env.ACCESS_TOKEN_SECRET_1 as string,
-      { expiresIn: '15m' }
+      { expiresIn: '30m' }
     )
 
     const refreshToken = jwt.sign(
       { userid: newUser._id, username: newUser.username },
       process.env.REFRESH_TOKEN_SECRET_2 as string,
-      { expiresIn: '1d' }
+      { expiresIn: '7d' }
     )
 
     newUser.refreshToken = refreshToken
@@ -96,6 +94,7 @@ export const HandleloginUser = async (
   res: Response
 ): Promise<void> => {
   try {
+    // we will use email later 
     const { username, password, email } = req.body
 
     if (!username || !password) {
@@ -148,7 +147,10 @@ export const HandleloginUser = async (
 
       res.json({
         accessToken,
-        user,
+        items : {
+         userid: user._id,
+         username: user.username
+        }
       })
     } else {
       user.loginAttempts++

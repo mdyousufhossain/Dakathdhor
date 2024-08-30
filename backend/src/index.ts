@@ -22,7 +22,9 @@ import { connectionToDatabase } from './Config/moongoose'
 const PORT = 9000
 
 /**
+ * 
  * this is the watcher , well not that good but at least somet'n
+ * 
  */
 app.use(logger)
 app.use(credentials)
@@ -37,8 +39,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api/v1', userRoute);
 
 app.use(verifyJWT)
-app.use('api/v1', taskRoute )
-app.use('api/v1', userInfo )
+app.use('/api/v1', taskRoute )
+app.use('/api/v1', userInfo )
 // app.use('/', (req, res) => {
 //   res.send('Hello Dakath!')
 // })

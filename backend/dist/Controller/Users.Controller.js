@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HandlelogoutUser = exports.HandleloginUser = exports.HandleRegisterUser = void 0;
+exports.handleGetUser = exports.handleCheckAvailityEmail = exports.handleCheckAvailityUsername = exports.HandlelogoutUser = exports.HandleloginUser = exports.HandleRegisterUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Users_Model_1 = __importDefault(require("../Model/Users.Model"));
@@ -25,15 +25,17 @@ const Users_Model_1 = __importDefault(require("../Model/Users.Model"));
  *
  * well deleting is account will be more peramoy than creating one yeah for sake of progress i will that later aswell ,
  */
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // i will add later
 // Register a new user
 const HandleRegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, password } = req.body;
-        const existingUser = yield Users_Model_1.default.findOne({ username });
-        if (existingUser) {
-            res.status(409).json({ error: 'This username is already in use' });
-            return;
+        const { username, password, email, batman, avatar, mobile, location, bio } = req.body;
+        const userExists = yield Users_Model_1.default.findOne({ $or: [{ username }, { email }] });
+        if (userExists) {
+            res.status(400).json({
+                message: userExists.username === username
+                    ? 'Username is already taken'
+                    : 'Email is already in use',
+            });
         }
         if (!username || !password) {
             res.status(400).json({ error: 'Please fill all the required fields' });
@@ -43,9 +45,15 @@ const HandleRegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const newUser = yield Users_Model_1.default.create({
             username,
             password: hashed,
+            email,
+            batman,
+            avatar,
+            mobile,
+            location,
+            bio,
         });
-        const accessToken = jsonwebtoken_1.default.sign({ userid: newUser._id, username: newUser.username }, process.env.ACCESS_TOKEN_SECRET_1, { expiresIn: '15m' });
-        const refreshToken = jsonwebtoken_1.default.sign({ userid: newUser._id, username: newUser.username }, process.env.REFRESH_TOKEN_SECRET_2, { expiresIn: '1d' });
+        const accessToken = jsonwebtoken_1.default.sign({ userid: newUser._id, username: newUser.username }, process.env.ACCESS_TOKEN_SECRET_1, { expiresIn: '30m' });
+        const refreshToken = jsonwebtoken_1.default.sign({ userid: newUser._id, username: newUser.username }, process.env.REFRESH_TOKEN_SECRET_2, { expiresIn: '7d' });
         newUser.refreshToken = refreshToken;
         yield newUser.save();
         res.cookie('jwt', refreshToken, {
@@ -54,8 +62,14 @@ const HandleRegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
         res.status(201).json({
             username,
+            email,
+            batman,
+            avatar,
+            mobile,
+            location,
+            bio,
             accessToken,
-            success: `New user ${username} created!`,
+            success: `New user ${newUser} created!`,
         });
     }
     catch (error) {
@@ -67,14 +81,17 @@ exports.HandleRegisterUser = HandleRegisterUser;
 // Login user
 const HandleloginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, password } = req.body;
+        // we will use email later 
+        const { username, password, email } = req.body;
         if (!username || !password) {
             res.status(400).json({ message: 'Please add username or password' });
             return;
         }
         const user = yield Users_Model_1.default.findOne({ username });
         if (!user) {
-            res.status(401).json({ message: 'No registered account. Please create an account.' });
+            res
+                .status(401)
+                .json({ message: 'No registered account. Please create an account.' });
             return;
         }
         if (user.accountLockedUntil && user.accountLockedUntil > new Date()) {
@@ -86,7 +103,7 @@ const HandleloginUser = (req, res) => __awaiter(void 0, void 0, void 0, function
         const isMatch = yield bcryptjs_1.default.compare(password, user.password);
         if (isMatch) {
             user.loginAttempts = 0;
-            user.accountLockedUntil = null; // we will work on this later 
+            user.accountLockedUntil = null; // we will work on this later
             const accessToken = jsonwebtoken_1.default.sign({ userid: user._id, username: user.username }, process.env.ACCESS_TOKEN_SECRET_1, { expiresIn: '15m' });
             const refreshToken = jsonwebtoken_1.default.sign({ userid: user._id, username: user.username }, process.env.REFRESH_TOKEN_SECRET_2, { expiresIn: '1d' });
             user.refreshToken = refreshToken;
@@ -96,9 +113,8 @@ const HandleloginUser = (req, res) => __awaiter(void 0, void 0, void 0, function
                 maxAge: 24 * 60 * 60 * 1000,
             });
             res.json({
-                username,
                 accessToken,
-                success: `User logged in: ${username}`,
+                user,
             });
         }
         else {
@@ -147,3 +163,39 @@ const HandlelogoutUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.HandlelogoutUser = HandlelogoutUser;
+const handleCheckAvailityUsername = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { username } = req.query;
+        const user = yield Users_Model_1.default.findOne({ username });
+        res.status(200).json({ available: !user }); // If user is null, it's available
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ available: false, error: 'Server error' });
+    }
+});
+exports.handleCheckAvailityUsername = handleCheckAvailityUsername;
+const handleCheckAvailityEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.query;
+        const isEmail = yield Users_Model_1.default.findOne({ email });
+        res.status(200).json({ available: !isEmail }); // If isEmail is null, it's available
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ available: false, error: 'Server error' });
+    }
+});
+exports.handleCheckAvailityEmail = handleCheckAvailityEmail;
+const handleGetUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { username } = req.query;
+        const user = yield Users_Model_1.default.findOne({ username });
+        res.status(200).json({ user });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ available: false, error: 'Server error' });
+    }
+});
+exports.handleGetUser = handleGetUser;

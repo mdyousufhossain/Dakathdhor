@@ -14,10 +14,11 @@ export const RegisterSchema = z.object({
 
 
 export const TaskSchema = z.object({
-    type: z.array(z.string()).nonempty('Task type is required'),
-    message: z.string(),
-    media: z.array(z.string()).optional(), // Media is optional and can be an array of strings
-    location: z.array(z.string()).nonempty('Location is required'),
-    isSolved: z.boolean().default(false),
-    // batmans: z.array(z.string().uuid()).optional(), // Batmans are optional and represented as an array of UUIDs
-});
+    author: z.string().min(5, 'Author is required'),
+    type: z.string().min(1, 'Task type is required'),
+    message: z.string().min(5, 'Message is required'),
+    media: z.array(z.string()).optional(),
+    location: z.string().min(4, 'Location is required'),
+    isSolved: z.boolean().optional(),
+    batmans: z.array(z.string()).optional(),
+  });
