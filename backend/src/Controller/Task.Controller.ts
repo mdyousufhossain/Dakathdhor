@@ -120,3 +120,19 @@ export const HandleTaskCreate = async (
     return res.status(500).json({ error: 'Failed to save task' })
   }
 }
+
+
+export const HandleTaskRetrieve = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    // Fetch all tasks from the database
+    const tasks = await Task.find();
+    if (!tasks) {
+      throw new Error("User not found or task not saved in user's taskgiven")
+    }
+    // Return the tasks in the response
+    return res.status(200).json(tasks);
+  } catch (error) {
+    console.error('Error retrieving tasks:', error);
+    return res.status(500).json({ error: 'Failed to retrieve tasks' });
+  }
+};

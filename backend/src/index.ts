@@ -18,7 +18,7 @@ import userRoute from './Route/userRoute'
 import taskRoute from './Route/taskRoute'
 import userInfo  from './Route/userInfoRoute'
 import { connectionToDatabase } from './Config/moongoose'
-
+import { apiRateLimiter } from './lib/latelimited'
 const PORT = 9000
 
 /**
@@ -34,7 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // just for the starter delete this not required !
 
-
+app.use(apiRateLimiter)
 
 app.use('/api/v1', userRoute);
 

@@ -94,7 +94,7 @@ export const HandleloginUser = async (
   res: Response
 ): Promise<void> => {
   try {
-    // we will use email later 
+    // we will use email later
     const { username, password, email } = req.body
 
     if (!username || !password) {
@@ -128,13 +128,13 @@ export const HandleloginUser = async (
       const accessToken = jwt.sign(
         { userid: user._id, username: user.username },
         process.env.ACCESS_TOKEN_SECRET_1 as string,
-        { expiresIn: '15m' }
+        { expiresIn: '12h' }
       )
 
       const refreshToken = jwt.sign(
         { userid: user._id, username: user.username },
         process.env.REFRESH_TOKEN_SECRET_2 as string,
-        { expiresIn: '1d' }
+        { expiresIn: '7d' }
       )
 
       user.refreshToken = refreshToken
@@ -147,10 +147,10 @@ export const HandleloginUser = async (
 
       res.json({
         accessToken,
-        items : {
-         userid: user._id,
-         username: user.username
-        }
+        items: {
+          userid: user._id,
+          username: user.username,
+        },
       })
     } else {
       user.loginAttempts++
@@ -244,11 +244,11 @@ export const handleGetUser = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { username } = req.query
-
-    const user = await User.findOne({ username })
-
-    res.status(200).json({ user })
+    const { id } = req.params
+    const user = await User.findById(id)
+    if (!user) res.status(404).json({ message: 'No registered account. Please create an account.' });
+    
+    res.status(200).json(user)
   } catch (error) {
     console.log(error)
     res.status(500).json({ available: false, error: 'Server error' })
