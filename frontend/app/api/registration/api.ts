@@ -70,11 +70,12 @@ export const checkAvailability = async (
   return data.available
 }
 
-export const getUserInfo = async (id: 'username' | 'email', value: string) => {
-  const response = await fetch(`${URL}/user/getuser/${id}?${id}=${value}`, {
+export const getUserInfo = async (id:string) => {
+  const response = await fetch(`${URL}/user/getuser/${id}`, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`, 
     },
   })
 
@@ -87,3 +88,29 @@ export const getUserInfo = async (id: 'username' | 'email', value: string) => {
   console.log(data)
   return data 
 }
+
+export const getAlltask = async (endpoint: string, method: string) => {
+
+  try {
+    const response = await fetch(`${URL}${endpoint}`, {
+      method: method,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Ensure this token is valid and present
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'no task found');
+    }
+
+    const data = await response.json();
+    return {data}
+  } catch (error) {
+    console.error('Error creating task:', error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+};
+

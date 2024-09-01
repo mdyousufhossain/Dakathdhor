@@ -1,7 +1,7 @@
 import Header from "@/components/shared/Header";
 import { Metadata } from "next";
-import RightSidebar from "@/components/shared/RightSideBar"
 import { Home, Settings, LogOut } from 'lucide-react';
+import RightSidebar from "@/components/shared/RightSideBar";
 
 const items = [
   { label: 'Home', icon: <Home className='h-5 w-5' /> },

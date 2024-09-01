@@ -1,14 +1,37 @@
 'use client'
 
-import React, { use } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { Search, Bell, User, AlertTriangle, PlusCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { useAuth } from '@/auth/AuthContext'
+import { userData } from '@/type'
+import { getUserInfo } from '@/app/api/registration/api'
+import Link from 'next/link'
 
 const Header = () => {
-    const { user } = useAuth()
+  const { user } = useAuth()
+  const [userData, setUserData] = useState<userData | null>(null)
+  const [error, setError] = useState(null)
+  const id = user?.items?.userid
+
+  const gettingUserData = async () => {
+    if (id) {
+      console.log(id)
+      try {
+        const response = await getUserInfo(id)
+        
+        setUserData(response)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
+  useEffect(() => {
+    gettingUserData()
+  },[id])
   return (
     <section className="flex w-full p-4 justify-between bg-white ">
       {/* Left Section - Logo, Motto, and Search Bar */}
@@ -36,18 +59,18 @@ const Header = () => {
 
       {/* Right Section - Create Post, Profile, Notifications */}
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" className="p-2">
+        <Link href={'/createtask'} className="p-2">
           <PlusCircle className="w-6 h-6" />
-        </Button>
+        </Link>
         <Button variant="ghost" className="p-2">
           <Bell className="w-6 h-6" />
         </Button>
         <div className="flex items-center space-x-2">
           <Avatar className="h-8 w-8">
-          <AvatarImage src={user?.avatar || ''} alt={user?.username || 'User'} />
-          <AvatarFallback>{user?.username?.[0] || 'U'}</AvatarFallback>
+          <AvatarImage src={userData?.avatar || ''} alt={userData?.username || 'userData'} />
+          <AvatarFallback>{userData?.username?.[0] || 'U'}</AvatarFallback>
           </Avatar>
-          <span className="font-medium text-sm">{user?.username}</span>
+          <span className="font-medium text-sm">{userData?.username}</span>
         </div>
       </div>
     </section>

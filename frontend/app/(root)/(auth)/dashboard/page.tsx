@@ -1,11 +1,13 @@
-'use client'
+
+
+import TaskList from "@/components/shared/TaskList"
 
 
 const Page = () => {
 
   return (
     <div>
-        this is dashboard
+        <TaskList />
     </div>
   )
 }

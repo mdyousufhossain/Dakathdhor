@@ -29,7 +29,7 @@ function CreateTaskForm() {
   const form = useForm<z.infer<typeof TaskSchema>>({
     resolver: zodResolver(TaskSchema),
     defaultValues: {
-      author: user?.username || 'anonymous', // Ensure user is available, otherwise use a fallback
+      author: user?.items?.username || 'anonymous', // Ensure user is available, otherwise use a fallback
       type: '',
       message: '',
       media: [],
