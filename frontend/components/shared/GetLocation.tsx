@@ -10,14 +10,18 @@ const GoogleMapsButton = () => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const { latitude, longitude } = position.coords;
-          setLocation({ lat: latitude, lng: longitude });
-          setError(null);
- 
+          const { latitude, longitude, accuracy } = position.coords;
+          console.log(`Latitude: ${latitude}, Longitude: ${longitude}, Accuracy: ${accuracy} meters`);
 
-          const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${latitude},${longitude}&travelmode=driving`;
+          // Update the state with current accuracy and location
+          setLocation({ lat: latitude, lng: longitude });
+
+          // Open Google Maps with the obtained location
+          const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${latitude},${longitude}&travelmode=walking`;
 
           window.open(googleMapsUrl, '_blank');
+
+          setError(null);
         },
         (error) => {
           setError('Error getting location: ' + error.message);
@@ -25,6 +29,8 @@ const GoogleMapsButton = () => {
         },
         {
           enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
         }
       );
     } else {
@@ -40,7 +46,12 @@ const GoogleMapsButton = () => {
       >
         Get Directions
       </button>
-      {`${location?.lat} ${location?.lng}`}
+      {location && (
+        <div className="mt-2 text-green-500">
+          <p>Latitude: {location.lat}</p>
+          <p>Longitude: {location.lng}</p>
+        </div>
+      )}
       {error && (
         <div className="mt-4 text-red-500">
           <p>{error}</p>
